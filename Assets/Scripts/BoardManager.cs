@@ -45,3 +45,11 @@ public class CurveTile : Tile {
         this.position = position;
     }
 }
+
+public class BlankTile : Tile {
+    public BlankTile(Vector2Int position) {
+        this.type = "blank";
+        this.openings = new bool[] {false, false, false, false};
+        this.position = position;
+    }
+}

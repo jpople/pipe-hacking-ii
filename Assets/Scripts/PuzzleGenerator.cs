@@ -9,8 +9,16 @@ public class PuzzleGenerator : MonoBehaviour
 
     public GameObject cursorPrefab;
 
+    // sprites
     public Sprite straight;
     public Sprite curve;
+    public Sprite blank;
+
+    // random tile spawn rates (relative)
+    public int straightChance;
+    public int curveChance;
+    public int blankChance;
+
     public float tileScaling;
 
     public void Initialize() {
@@ -20,16 +28,26 @@ public class PuzzleGenerator : MonoBehaviour
     public void GeneratePuzzle() {
         for (int x = 0; x < boardWidth; x++) {
             for (int y = 0; y < boardHeight; y++) {
-                Tile newTile = null;
-                if (Random.Range(0, 2) == 1) {
-                    newTile = new StraightTile(new Vector2Int(x, y), Random.Range(0, 4));
-                }
-                else {
-                    newTile = new CurveTile(new Vector2Int(x, y), Random.Range(0, 4));
-                }
+                Tile newTile = GenerateRandomTile(new Vector2Int(x, y));
                 BoardManager.board[x, y] = newTile;
             }
         }
+    }
+
+    public Tile GenerateRandomTile(Vector2Int position) {
+        Tile newTile = null;
+        int sumOfRates = straightChance + curveChance + blankChance;
+        int roll = Random.Range(0, sumOfRates);
+        if (roll < straightChance) {
+            newTile = new StraightTile(position, Random.Range(0, 4));
+        }
+        else if ((roll -= straightChance) < curveChance) {
+            newTile = new CurveTile(position, Random.Range(0, 4));
+        }
+        else {
+            newTile = new BlankTile(position);
+        }
+        return newTile;
     }
 
     public void DrawBoard() {
@@ -49,6 +67,9 @@ public class PuzzleGenerator : MonoBehaviour
                         case "curve":
                             newTileObject.GetComponent<SpriteRenderer>().sprite = curve;
                             break;
+                        case "blank":
+                            newTileObject.GetComponent<SpriteRenderer>().sprite = blank;
+                            break;
                     }
                     newTileObject.transform.position = new Vector3(x * tileScaling, y * tileScaling, 0);
                     newTileObject.transform.Rotate(new Vector3(0, 0, tile.orientation * 90));
@@ -58,10 +79,6 @@ public class PuzzleGenerator : MonoBehaviour
                     tile.baseObject = newTileObject;
                 }
             }
-        }
-        Debug.Log(BoardManager.board[0, 0].orientation);
-        for (int i = 0; i < 4; i++) {
-            Debug.Log($"{i}: {BoardManager.board[0, 0].openings[i]}");
         }
     }
 }

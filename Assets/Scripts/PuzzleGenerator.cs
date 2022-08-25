@@ -14,7 +14,7 @@ public class PuzzleGenerator : MonoBehaviour
     public Sprite curve;
     public Sprite blank;
 
-    // random tile spawn rates (relative)
+    // random tile spawn rates (proportional, e.g. 2/2/1 yields 40%/40%/20% spawn chance)
     public int straightChance;
     public int curveChance;
     public int blankChance;
@@ -71,10 +71,12 @@ public class PuzzleGenerator : MonoBehaviour
                             newTileObject.GetComponent<SpriteRenderer>().sprite = blank;
                             break;
                     }
+
                     newTileObject.transform.position = new Vector3(x * tileScaling, y * tileScaling, 0);
                     newTileObject.transform.Rotate(new Vector3(0, 0, tile.orientation * 90));
-                    newTileObject.transform.parent = tileHolder.transform;
                     newTileObject.name = $"{tile.type} @ {tile.position.x}, {tile.position.y}";
+
+                    newTileObject.transform.parent = tileHolder.transform;
 
                     tile.baseObject = newTileObject;
                 }

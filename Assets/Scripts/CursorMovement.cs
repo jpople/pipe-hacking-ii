@@ -6,7 +6,7 @@ public class CursorMovement : MonoBehaviour
 {
     public Vector2Int position;
 
-    public float moveTime = 0.1f;
+    public float moveTime = 0.15f;
     bool isMoving;
 
     GameManager manager;
@@ -23,29 +23,29 @@ public class CursorMovement : MonoBehaviour
     private void Update() {
         // also also TODO: update isSelected of tiles appropriately
         // TODO: this shit can *super* be refactored into a nicer external Move() method that can also handle the tiles' isSelected
-        
+
         Vector3 destinationPosition;
         Vector2Int destination;
 
-        if (Input.GetKey("w") && !isMoving) {
+        if (Input.GetKeyDown("w") && !isMoving) {
             destination = MovementTarget(position, Vector2Int.up);
             destinationPosition = GetTransformPosition(destination);
             StartCoroutine(MoveCursor(destinationPosition));
             position = destination;
         }
-        if (Input.GetKey("a") && !isMoving) {
+        if (Input.GetKeyDown("a") && !isMoving) {
             destination = MovementTarget(position, Vector2Int.left);
             destinationPosition = GetTransformPosition(destination);
             StartCoroutine(MoveCursor(destinationPosition));
             position = destination;
         }
-        if (Input.GetKey("s") && !isMoving) {
+        if (Input.GetKeyDown("s") && !isMoving) {
             destination = MovementTarget(position, Vector2Int.down);
             destinationPosition = GetTransformPosition(destination);
             StartCoroutine(MoveCursor(destinationPosition));
             position = destination;
         }
-        if (Input.GetKey("d") && !isMoving) {
+        if (Input.GetKeyDown("d") && !isMoving) {
             destination = MovementTarget(position, Vector2Int.right);
             destinationPosition = GetTransformPosition(destination);
             StartCoroutine(MoveCursor(destinationPosition));

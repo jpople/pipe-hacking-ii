@@ -83,4 +83,10 @@ public class PuzzleGenerator : MonoBehaviour
             }
         }
     }
+
+    public void SpawnCursor() {
+        GameObject cursor = GameObject.Instantiate(cursorPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+        CursorMovement movement = cursor.GetComponent<CursorMovement>();
+        movement.position = new Vector2Int (0, 0);
+    }
 }

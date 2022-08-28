@@ -12,5 +12,6 @@ public class GameManager : MonoBehaviour
         puzzleGenerator.Initialize();
         puzzleGenerator.GeneratePuzzle();
         puzzleGenerator.DrawBoard();
+        puzzleGenerator.SpawnCursor();
     }
 }

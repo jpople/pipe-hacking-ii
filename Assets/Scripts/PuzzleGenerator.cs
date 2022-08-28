@@ -85,7 +85,10 @@ public class PuzzleGenerator : MonoBehaviour
         }
         Tile inputTile = new InputTile(inputPosition);
         inputTile.orientation = 3 - wallRoll;
+        inputTile.rotate(inputTile.orientation);
         BoardManager.board[inputPosition.x, inputPosition.y] = inputTile;
+        BoardManager.input = inputTile;
+
         // place output tile
         Vector2Int drainPosition = new Vector2Int();
         // we have to do a little extra work here to make sure the input and output aren't right next to each other to prevent the solution from being trivial
@@ -153,6 +156,10 @@ public class PuzzleGenerator : MonoBehaviour
                     newTileObject.name = $"{tile.type} @ {tile.position.x}, {tile.position.y}";
 
                     newTileObject.transform.parent = tileHolder.transform;
+                    if (!tile.isBorder && !tile.isPartOfPipeline) {
+                        newTileObject.transform.localScale = newTileObject.transform.localScale * 0.75f;
+                        newTileObject.GetComponent<SpriteRenderer>().color = new Color(0.8f, 0.8f, 0.8f);
+                    }
 
                     tile.baseObject = newTileObject;
                 }

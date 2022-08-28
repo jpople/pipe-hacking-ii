@@ -5,6 +5,8 @@ using UnityEngine;
 public class BoardManager
 {
     public static Tile[,] board;
+    public static Tile input;
+
 }
 
 public class Tile {
@@ -14,8 +16,8 @@ public class Tile {
     public bool[] openings; // starts at top and counts clockwise
 
     // game logic stuff
-    public bool isSelected;
     public bool isBorder = false;
+    public bool isPartOfPipeline = false;
 
     public GameObject baseObject;
 
@@ -59,7 +61,9 @@ public class BlankTile : Tile {
 public class InputTile : Tile {
     public InputTile(Vector2Int position) {
         this.type = "input";
-        this.openings = new bool[] {false, false, true, false};
+        this.isBorder = true;
+        this.isPartOfPipeline = true;
+        this.openings = new bool[] {false, true, false, false};
         this.position = position;
     }
 }
@@ -67,7 +71,8 @@ public class InputTile : Tile {
 public class DrainTile : Tile {
     public DrainTile(Vector2Int position) {
         this.type = "drain";
-        this.openings = new bool[] {false, false, true, false};
+        this.isBorder = true;
+        this.openings = new bool[] {false, true, false, false};
         this.position = position;
     }
 }

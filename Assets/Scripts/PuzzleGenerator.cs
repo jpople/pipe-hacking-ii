@@ -13,6 +13,7 @@ public class PuzzleGenerator : MonoBehaviour
     public Sprite straight;
     public Sprite curve;
     public Sprite blank;
+    public Sprite input;
 
     // random tile spawn rates (proportional, e.g. 2/2/1 yields 40%/40%/20% spawn chance)
     public int straightChance;
@@ -26,9 +27,17 @@ public class PuzzleGenerator : MonoBehaviour
     }
 
     public void GeneratePuzzle() {
+        // GenerateGoals();
         for (int x = 0; x < boardWidth; x++) {
             for (int y = 0; y < boardHeight; y++) {
-                Tile newTile = GenerateRandomTile(new Vector2Int(x, y));
+                Tile newTile = null;
+                if (x == 0 || y == 0 || x == boardWidth - 1 || y == boardHeight -1 ) {
+                    newTile = new BlankTile(new Vector2Int(x, y));
+                    newTile.isBorder = true;
+                }
+                else {
+                    newTile = GenerateRandomTile(new Vector2Int(x, y));
+                }
                 BoardManager.board[x, y] = newTile;
             }
         }
@@ -48,6 +57,11 @@ public class PuzzleGenerator : MonoBehaviour
             newTile = new BlankTile(position);
         }
         return newTile;
+    }
+
+    public void GenerateGoals() {
+        // simpler approach where we use x = -1 isn't gonna work actually, need to move entire grid over like we originally thought
+        // oh well
     }
 
     public void DrawBoard() {
@@ -87,6 +101,7 @@ public class PuzzleGenerator : MonoBehaviour
     public void SpawnCursor() {
         GameObject cursor = GameObject.Instantiate(cursorPrefab, new Vector3(0, 0, 0), Quaternion.identity);
         CursorMovement movement = cursor.GetComponent<CursorMovement>();
-        movement.position = new Vector2Int (0, 0);
+        movement.position = new Vector2Int (Random.Range(1, boardWidth - 2), Random.Range(1, boardHeight - 2));
+        cursor.transform.position = new Vector3(movement.position.x * tileScaling, movement.position.y * tileScaling, 1);
     }
 }

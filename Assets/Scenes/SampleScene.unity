@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 519420032}
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
+  - component: {fileID: 519420030}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -149,6 +150,19 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_Enabled: 1
+--- !u!114 &519420030
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd254cbb32123a049bd36e7a1a10b3b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  manager: {fileID: 839611775}
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -236,12 +250,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6968a62fbc2edfe4ca575fb1961dfbe3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boardWidth: 5
-  boardHeight: 5
+  boardWidth: 7
+  boardHeight: 7
   cursorPrefab: {fileID: 6328859732789752319, guid: 526c8ee36d51d0044b3e4f4e3a0d543b, type: 3}
   straight: {fileID: 21300000, guid: e473de26ba8aa7b40ac0d227bdcfd9d9, type: 3}
   curve: {fileID: 21300000, guid: 4629fc5382f0c8b449ab5dd28e2a1b0f, type: 3}
   blank: {fileID: 21300000, guid: 574f9b39ef34d0743820bdbf38102197, type: 3}
+  input: {fileID: 0}
   straightChance: 2
   curveChance: 2
   blankChance: 1

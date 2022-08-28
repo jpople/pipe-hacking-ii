@@ -16,7 +16,6 @@ public class CursorMovement : MonoBehaviour
     private void Start() {
         // manager = GameObject.Find("GameManager").GetComponent<GameManager>();
         puzzle = GameObject.Find("GameManager").GetComponent<PuzzleGenerator>();
-        transform.position = Vector3.zero;
         // sprite = transform.Find("Cursor").transform
     }
 
@@ -55,17 +54,17 @@ public class CursorMovement : MonoBehaviour
 
     Vector2Int MovementTarget(Vector2Int start, Vector2Int direction) { // "clips" movement to make edges of board loop
         Vector2Int target = start + direction;
-        if (direction == Vector2Int.up && start.y == puzzle.boardHeight - 1) {
-            target.y = 0;
+        if (direction == Vector2Int.up && start.y == puzzle.boardHeight - 2) {
+            target.y = 1;
         }
-        else if (direction == Vector2Int.down && start.y == 0) {
-            target.y = puzzle.boardHeight - 1;
+        else if (direction == Vector2Int.down && start.y == 1) {
+            target.y = puzzle.boardHeight - 2;
         }
-        if (direction == Vector2Int.right && start.x == puzzle.boardWidth - 1) {
-            target.x = 0;
+        if (direction == Vector2Int.right && start.x == puzzle.boardWidth - 2) {
+            target.x = 1;
         }
-        else if (direction == Vector2Int.left && start.x == 0) {
-            target.x = puzzle.boardWidth - 1;
+        else if (direction == Vector2Int.left && start.x == 1) {
+            target.x = puzzle.boardWidth - 2;
         }
         return target;
     }

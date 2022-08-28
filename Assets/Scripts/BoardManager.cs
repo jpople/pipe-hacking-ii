@@ -56,9 +56,17 @@ public class BlankTile : Tile {
     }
 }
 
-public class GoalTile : Tile {
-    public GoalTile(Vector2Int position, string type) {
-        this.type = type;
+public class InputTile : Tile {
+    public InputTile(Vector2Int position) {
+        this.type = "input";
+        this.openings = new bool[] {false, false, true, false};
+        this.position = position;
+    }
+}
+
+public class DrainTile : Tile {
+    public DrainTile(Vector2Int position) {
+        this.type = "drain";
         this.openings = new bool[] {false, false, true, false};
         this.position = position;
     }

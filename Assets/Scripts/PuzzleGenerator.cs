@@ -14,6 +14,7 @@ public class PuzzleGenerator : MonoBehaviour
     public Sprite curve;
     public Sprite blank;
     public Sprite input;
+    public Sprite drain;
 
     // random tile spawn rates (proportional, e.g. 2/2/1 yields 40%/40%/20% spawn chance)
     public int straightChance;
@@ -62,12 +63,12 @@ public class PuzzleGenerator : MonoBehaviour
     }
 
     public void GenerateGoals() {
-        // input tile
+        // probably this doesn't need to be one method with two parts
+        // place input tile
+        Vector2Int inputPosition = new Vector2Int();
         int wallRoll = Random.Range(0, 4); // top, then count clockwise
         int wallSize = wallRoll % 2 == 0 ? boardWidth : boardHeight;
         int positionOnWall = Random.Range(1, wallSize - 1);
-        Tile inputTile;
-        Vector2Int inputPosition = new Vector2Int();
         switch(wallRoll) {
             case 0:
                 inputPosition = new Vector2Int(positionOnWall, boardHeight - 1);
@@ -82,9 +83,40 @@ public class PuzzleGenerator : MonoBehaviour
                 inputPosition = new Vector2Int(0, positionOnWall);
                 break;
         }
-        inputTile = new GoalTile(inputPosition, "input");
+        Tile inputTile = new InputTile(inputPosition);
         inputTile.orientation = 3 - wallRoll;
         BoardManager.board[inputPosition.x, inputPosition.y] = inputTile;
+        // place output tile
+        Vector2Int drainPosition = new Vector2Int();
+        // we have to do a little extra work here to make sure the input and output aren't right next to each other to prevent the solution from being trivial
+        bool isAcceptable = false;
+        while (!isAcceptable) {
+            wallRoll = Random.Range(0, 4);
+            wallSize = wallRoll % 2 == 0 ? boardWidth : boardHeight;
+            positionOnWall = Random.Range(1, wallSize - 1);
+            switch(wallRoll) {
+            case 0:
+                drainPosition = new Vector2Int(positionOnWall, boardHeight - 1);
+                break;
+            case 1:
+                drainPosition = new Vector2Int(boardWidth - 1, positionOnWall);
+                break;
+            case 2:
+                drainPosition = new Vector2Int(positionOnWall, 0);
+                break;
+            case 3:
+                drainPosition = new Vector2Int(0, positionOnWall);
+                break;
+            }
+            if (Vector2Int.Distance(inputPosition, drainPosition) >= 3) {
+                // this logic can eventually be more interesting and allow for, e.g., input and drain that are right next to each other but have paths that go opposite directions for a bit
+                // that's a lot of work though, and this works for now
+                isAcceptable = true;
+            }
+        }
+        Tile drainTile = new DrainTile(drainPosition);
+        drainTile.orientation = 3 - wallRoll;
+        BoardManager.board[drainPosition.x, drainPosition.y] = drainTile;
 
     }
 
@@ -110,6 +142,9 @@ public class PuzzleGenerator : MonoBehaviour
                             break;
                         case "input":
                             newTileObject.GetComponent<SpriteRenderer>().sprite = input;
+                            break;
+                        case "drain":
+                            newTileObject.GetComponent<SpriteRenderer>().sprite = drain;
                             break;
                     }
 

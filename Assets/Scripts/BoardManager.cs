@@ -9,13 +9,13 @@ public class BoardManager
 
 public class Tile {
     public Vector2Int position;
-    public int orientation; // # of rotations CCW from upright position
+    public int orientation; // # of 90° rotations CCW from upright position
     public string type;
     public bool[] openings; // starts at top and counts clockwise
 
     // game logic stuff
     public bool isSelected;
-    public bool isBorder;
+    public bool isBorder = false;
 
     public GameObject baseObject;
 

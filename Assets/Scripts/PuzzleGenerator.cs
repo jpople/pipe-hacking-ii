@@ -27,18 +27,20 @@ public class PuzzleGenerator : MonoBehaviour
     }
 
     public void GeneratePuzzle() {
-        // GenerateGoals();
+        GenerateGoals();
         for (int x = 0; x < boardWidth; x++) {
             for (int y = 0; y < boardHeight; y++) {
-                Tile newTile = null;
-                if (x == 0 || y == 0 || x == boardWidth - 1 || y == boardHeight -1 ) {
-                    newTile = new BlankTile(new Vector2Int(x, y));
-                    newTile.isBorder = true;
+                if (BoardManager.board[x, y] == null) {
+                    Tile newTile = null;
+                    if (x == 0 || y == 0 || x == boardWidth - 1 || y == boardHeight -1) {
+                        newTile = new BlankTile(new Vector2Int(x, y));
+                        newTile.isBorder = true;
+                    }
+                    else {
+                        newTile = GenerateRandomTile(new Vector2Int(x, y));
+                    }
+                    BoardManager.board[x, y] = newTile;
                 }
-                else {
-                    newTile = GenerateRandomTile(new Vector2Int(x, y));
-                }
-                BoardManager.board[x, y] = newTile;
             }
         }
     }
@@ -60,8 +62,30 @@ public class PuzzleGenerator : MonoBehaviour
     }
 
     public void GenerateGoals() {
-        // simpler approach where we use x = -1 isn't gonna work actually, need to move entire grid over like we originally thought
-        // oh well
+        // input tile
+        int wallRoll = Random.Range(0, 4); // top, then count clockwise
+        int wallSize = wallRoll % 2 == 0 ? boardWidth : boardHeight;
+        int positionOnWall = Random.Range(1, wallSize - 1);
+        Tile inputTile;
+        Vector2Int inputPosition = new Vector2Int();
+        switch(wallRoll) {
+            case 0:
+                inputPosition = new Vector2Int(positionOnWall, boardHeight - 1);
+                break;
+            case 1:
+                inputPosition = new Vector2Int(boardWidth - 1, positionOnWall);
+                break;
+            case 2:
+                inputPosition = new Vector2Int(positionOnWall, 0);
+                break;
+            case 3:
+                inputPosition = new Vector2Int(0, positionOnWall);
+                break;
+        }
+        inputTile = new GoalTile(inputPosition, "input");
+        inputTile.orientation = 3 - wallRoll;
+        BoardManager.board[inputPosition.x, inputPosition.y] = inputTile;
+
     }
 
     public void DrawBoard() {
@@ -83,6 +107,9 @@ public class PuzzleGenerator : MonoBehaviour
                             break;
                         case "blank":
                             newTileObject.GetComponent<SpriteRenderer>().sprite = blank;
+                            break;
+                        case "input":
+                            newTileObject.GetComponent<SpriteRenderer>().sprite = input;
                             break;
                     }
 

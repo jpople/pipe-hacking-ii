@@ -85,7 +85,8 @@ public class CursorMovement : MonoBehaviour
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-
+        
+        transform.position = destination;
         isMoving = false;
     }
 }

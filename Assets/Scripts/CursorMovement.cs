@@ -6,6 +6,8 @@ public class CursorMovement : MonoBehaviour
 {
     public Vector2Int position;
 
+    public AudioSource source;
+
     public float moveTime = 0.15f;
     bool isMoving;
 
@@ -87,6 +89,7 @@ public class CursorMovement : MonoBehaviour
         }
         
         transform.position = destination;
+        source.Play();
         isMoving = false;
     }
 }

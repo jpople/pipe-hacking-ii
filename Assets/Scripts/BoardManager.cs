@@ -6,14 +6,11 @@ public class BoardManager
 {
     public static Tile[,] board;
     public static Tile input;
+    public static Tile drain;
+    public static Tile selectedTile;
+
     public static Tile GetTile(Vector2Int position) {
-        try {
-            return board[position.x, position.y];
-        }
-        catch (System.IndexOutOfRangeException e) {
-            Debug.Log($"an invalid tile was attempted to be accessed at {position.x},{position.y}!");
-        }
-        return null;
+        return board[position.x, position.y];
     }
 }
 

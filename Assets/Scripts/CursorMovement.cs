@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class CursorMovement : MonoBehaviour
 {
+    GameManager manager;
+    PuzzleGenerator puzzle;
+    
     public Vector2Int position;
 
     public AudioSource source;
@@ -11,14 +14,11 @@ public class CursorMovement : MonoBehaviour
     public float moveTime = 0.15f;
     bool isMoving;
 
-    GameManager manager;
-    PuzzleGenerator puzzle;
-    // Transform sprite;
+    public GameObject selectionPrefab;
+    bool isSelecting = true;
 
     private void Start() {
-        // manager = GameObject.Find("GameManager").GetComponent<GameManager>();
         puzzle = GameObject.Find("GameManager").GetComponent<PuzzleGenerator>();
-        // sprite = transform.Find("Cursor").transform
     }
 
     private void Update() {
@@ -51,6 +51,22 @@ public class CursorMovement : MonoBehaviour
             destinationPosition = GetTransformPosition(destination);
             StartCoroutine(MoveCursor(destinationPosition));
             position = destination;
+        }
+        if(Input.GetKeyDown("e") && !isMoving) {
+            if (isSelecting) {
+                GameObject selectionIndicator = GameObject.Instantiate(selectionPrefab, transform.position, Quaternion.identity);
+                BoardManager.selectedTile = BoardManager.GetTile(position);
+                isSelecting = false;
+            }
+            else {
+                // swap selected tile with hovered tile
+            }
+        }
+        if(Input.GetKeyDown("escape") && !isMoving) {
+
+            Destroy(GameObject.Find("Selected(Clone)"));
+            BoardManager.selectedTile = null;
+            isSelecting = true;
         }
     }
 

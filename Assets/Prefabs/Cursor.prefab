@@ -48,6 +48,7 @@ MonoBehaviour:
   position: {x: 0, y: 0}
   source: {fileID: -7730350641336391719}
   moveTime: 0.1
+  selectionPrefab: {fileID: 4292637244927717752, guid: a912664ab55a78241ae74b82258e44c0, type: 3}
 --- !u!212 &6328859732789752314
 SpriteRenderer:
   m_ObjectHideFlags: 0

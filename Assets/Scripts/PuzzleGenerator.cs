@@ -121,6 +121,7 @@ public class PuzzleGenerator : MonoBehaviour
         Tile drainTile = new DrainTile(drainPosition);
         drainTile.orientation = 3 - wallRoll;
         BoardManager.board[drainPosition.x, drainPosition.y] = drainTile;
+        BoardManager.drain = drainTile;
 
     }
 

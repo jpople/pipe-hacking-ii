@@ -84,9 +84,6 @@ public class PipeLogic
                 }
             }
             pipeline = newPipeline;
-            foreach(Tile pipe in pipeline) {
-                Debug.Log($"{pipe.type} @ {pipe.position.x}, {pipe.position.y}");
-            }
         }
     }
 }

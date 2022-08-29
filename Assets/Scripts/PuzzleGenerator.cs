@@ -21,7 +21,7 @@ public class PuzzleGenerator : MonoBehaviour
     public int curveChance;
     public int blankChance;
 
-    public float tileScaling;
+    public float tileScaling = 0.16f;
 
     public void Initialize() {
         BoardManager.board = new Tile[boardWidth, boardHeight];
@@ -44,6 +44,7 @@ public class PuzzleGenerator : MonoBehaviour
                 }
             }
         }
+        PipeLogic.TracePipeline(BoardManager.input.position);
     }
 
     public Tile GenerateRandomTile(Vector2Int position) {

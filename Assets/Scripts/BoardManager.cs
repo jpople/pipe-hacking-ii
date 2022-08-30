@@ -8,6 +8,7 @@ public class BoardManager
     public static Tile input;
     public static Tile drain;
     public static Tile selectedTile;
+    public static Tile fillingTile;
 
     public static Tile GetTile(Vector2Int position) {
         return board[position.x, position.y];
@@ -20,9 +21,13 @@ public class Tile {
     public string type;
     public bool[] openings; // starts at top and counts clockwise
 
-    // game logic stuff
+    // pipe logic stuff
     public bool isBorder = false;
     public bool isPartOfPipeline = false;
+
+    // flow logic stuff
+    public float capacity = 100f;
+    public float waterLevel = 0;
 
     public GameObject baseObject;
 

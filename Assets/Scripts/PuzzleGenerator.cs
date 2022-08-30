@@ -21,6 +21,9 @@ public class PuzzleGenerator : MonoBehaviour
     public int curveChance;
     public int blankChance;
 
+    // flow rate
+    public float flowRate;
+
     public float tileScaling = 0.16f;
 
     public void Initialize() {
@@ -89,6 +92,7 @@ public class PuzzleGenerator : MonoBehaviour
         inputTile.rotate(inputTile.orientation);
         BoardManager.board[inputPosition.x, inputPosition.y] = inputTile;
         BoardManager.input = inputTile;
+        BoardManager.fillingTile = inputTile;
 
         // place output tile
         Vector2Int drainPosition = new Vector2Int();
@@ -167,7 +171,27 @@ public class PuzzleGenerator : MonoBehaviour
                     }
 
                     tile.baseObject = newTileObject;
+
+                    // elaborate debug stuff
+                    GameObject tileLabel = new GameObject();
+                    tileLabel.transform.position = tile.baseObject.transform.position;
+                    tileLabel.AddComponent<TextMesh>();
+                    TextMesh labelText = tileLabel.GetComponent<TextMesh>();
+                    labelText.text = tile.waterLevel.ToString();
+                    labelText.anchor = TextAnchor.MiddleCenter;
+                    labelText.characterSize = 0.05f;
+                    tileLabel.transform.parent = tile.baseObject.transform;
                 }
+            }
+        }
+    }
+
+    public void RefreshLabels () {
+        // oh god this sucks
+        for(int x = 0; x < boardWidth; x++) {
+            for (int y = 0; y < boardHeight; y++) {
+                TextMesh label = BoardManager.board[x, y].baseObject.GetComponentInChildren<TextMesh>();
+                label.text = BoardManager.board[x, y].waterLevel.ToString();
             }
         }
     }

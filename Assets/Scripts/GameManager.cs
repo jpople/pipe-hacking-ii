@@ -14,4 +14,20 @@ public class GameManager : MonoBehaviour
         puzzleGenerator.DrawBoard();
         puzzleGenerator.SpawnCursor();
     }
+
+    void FixedUpdate() {
+        if (BoardManager.fillingTile.waterLevel < BoardManager.fillingTile.capacity) {
+            BoardManager.fillingTile.waterLevel += puzzleGenerator.flowRate;
+            puzzleGenerator.RefreshLabels();
+        }
+        else {
+            int index = PipeLogic.pipeline.IndexOf(BoardManager.fillingTile);
+            if (PipeLogic.pipeline.Count > index + 1) {
+                BoardManager.fillingTile = PipeLogic.pipeline[index + 1];
+            }
+            else {
+                Debug.Log("you lose!");
+            }
+        }
+    }
 }

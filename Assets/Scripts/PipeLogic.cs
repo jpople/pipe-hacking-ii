@@ -25,6 +25,9 @@ public class PipeLogic
     }
 
     public static void TracePipeline(Vector2Int inputPosition) {
+        foreach (Tile tile in pipeline) {
+            tile.isPartOfPipeline = false;
+        }
         Tile input = BoardManager.GetTile(inputPosition);
         int direction = 0;
         for (int i = 0; i < 4; i++) {

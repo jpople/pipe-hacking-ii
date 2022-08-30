@@ -127,6 +127,9 @@ public class PuzzleGenerator : MonoBehaviour
 
     public void DrawBoard() {
         GameObject tileHolder = GameObject.Find("TileHolder");
+        foreach (Transform child in tileHolder.transform) {
+            GameObject.Destroy(child.gameObject);
+        }
 
         for (int y = 0; y < boardHeight; y++) {
             for (int x = 0; x < boardWidth; x++) {

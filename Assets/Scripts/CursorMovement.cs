@@ -9,7 +9,10 @@ public class CursorMovement : MonoBehaviour
     
     public Vector2Int position;
 
-    public AudioSource source;
+    public AudioSource moveAudio;
+    public AudioSource cancelAudio;
+    public AudioSource selectAudio;
+    public AudioSource swapAudio;
 
     public float moveTime = 0.15f;
     bool isMoving;
@@ -54,16 +57,17 @@ public class CursorMovement : MonoBehaviour
         }
         if(Input.GetKeyDown("e") && !isMoving) {
             if (isSelecting) {
+                selectAudio.Play();
                 GameObject selectionIndicator = GameObject.Instantiate(selectionPrefab, transform.position, Quaternion.identity);
                 BoardManager.selectedTile = BoardManager.GetTile(position);
                 isSelecting = false;
             }
             else {
-                // swap selected tile with hovered tile
+                SwapTiles();
             }
         }
         if(Input.GetKeyDown("escape") && !isMoving) {
-
+            cancelAudio.Play();
             Destroy(GameObject.Find("Selected(Clone)"));
             BoardManager.selectedTile = null;
             isSelecting = true;
@@ -91,6 +95,26 @@ public class CursorMovement : MonoBehaviour
         return BoardManager.board[coords.x, coords.y].baseObject.transform.position;
     }
 
+    void SwapTiles() {
+        // should probably add a coroutine/animation for this but this'll be fine for now
+        Tile hovered = BoardManager.GetTile(position);
+        Tile selected = BoardManager.selectedTile;
+        Vector2Int selectedPositionCopy = selected.position;
+        BoardManager.board[selected.position.x, selected.position.y] = hovered;
+        BoardManager.board[hovered.position.x, hovered.position.y] = selected;
+        selected.position = hovered.position;
+        hovered.position = selectedPositionCopy;
+
+        PipeLogic.TracePipeline(BoardManager.input.position);
+        puzzle.DrawBoard();
+
+
+        swapAudio.Play();
+        Destroy(GameObject.Find("Selected(Clone)"));
+        BoardManager.selectedTile = null;
+        isSelecting = true;
+    }
+
     private IEnumerator MoveCursor(Vector3 destination) {
         isMoving = true;
 
@@ -105,7 +129,7 @@ public class CursorMovement : MonoBehaviour
         }
         
         transform.position = destination;
-        source.Play();
+        moveAudio.Play();
         isMoving = false;
     }
 }

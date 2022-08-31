@@ -81,7 +81,7 @@ public class PipeLogic
                         newPipeline.Add(next);
                         next.isPartOfPipeline = true;
                         current = next;
-                        foundEnd = false;
+                        foundEnd = current == BoardManager.drain;
                         break;
                     }
                 }

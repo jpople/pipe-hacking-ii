@@ -56,21 +56,26 @@ public class CursorMovement : MonoBehaviour
             position = destination;
         }
         if(Input.GetKeyDown("e") && !isMoving) {
-            if (isSelecting) {
-                selectAudio.Play();
-                GameObject selectionIndicator = GameObject.Instantiate(selectionPrefab, transform.position, Quaternion.identity);
-                BoardManager.selectedTile = BoardManager.GetTile(position);
-                isSelecting = false;
-            }
-            else {
-                SwapTiles();
+            if (BoardManager.GetTile(position).waterLevel == 0) {
+                if (isSelecting) {
+                    selectAudio.Play();
+                    GameObject selectionIndicator = GameObject.Instantiate(selectionPrefab, transform.position, Quaternion.identity);
+                    BoardManager.selectedTile = BoardManager.GetTile(position);
+                    isSelecting = false;
+                }
+                else {
+                    SwapTiles();
+                }
             }
         }
-        if(Input.GetKeyDown("escape") && !isMoving) {
+        if(Input.GetKeyDown("q") && !isMoving) {
             cancelAudio.Play();
             Destroy(GameObject.Find("Selected(Clone)"));
             BoardManager.selectedTile = null;
             isSelecting = true;
+        }
+        if(Input.GetKeyDown("f") && !isMoving) {
+            puzzle.flowRate = 20;
         }
     }
 

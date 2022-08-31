@@ -261,6 +261,7 @@ MonoBehaviour:
   straightChance: 2
   curveChance: 2
   blankChance: 1
+  flowRate: 0.1
   tileScaling: 0.17
 --- !u!114 &839611775
 MonoBehaviour:

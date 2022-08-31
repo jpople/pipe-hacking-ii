@@ -25,6 +25,9 @@ public class GameManager : MonoBehaviour
             if (PipeLogic.pipeline.Count > index + 1) {
                 BoardManager.fillingTile = PipeLogic.pipeline[index + 1];
             }
+            else if (BoardManager.fillingTile == BoardManager.drain) {
+                Debug.Log("you win!");
+            }
             else {
                 Debug.Log("you lose!");
             }

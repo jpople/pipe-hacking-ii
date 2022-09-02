@@ -14,8 +14,8 @@ public class PuzzleGenerator : MonoBehaviour
     public Sprite[] straight;
     public Sprite[] curve;
     public Sprite blank;
-    public Sprite input;
-    public Sprite drain;
+    public Sprite[] input;
+    public Sprite[] drain;
 
     // random tile spawn rates (proportional, e.g. 2/2/1 yields 40%/40%/20% spawn chance)
     public int straightChance;
@@ -156,13 +156,17 @@ public class PuzzleGenerator : MonoBehaviour
                             newTileObject.GetComponent<SpriteRenderer>().sprite = curve[spriteNumber];
                             break;
                         case "blank":
-                            newTileObject.GetComponent<SpriteRenderer>().sprite = blank;
+                            if(!tile.isBorder) {
+                                newTileObject.GetComponent<SpriteRenderer>().sprite = blank;
+                            }
                             break;
                         case "input":
-                            newTileObject.GetComponent<SpriteRenderer>().sprite = input;
+                            spriteNumber = (int) Mathf.Clamp(Mathf.FloorToInt((tile.waterLevel / tile.capacity) * input.Length), 0, input.Length - 1);
+                            newTileObject.GetComponent<SpriteRenderer>().sprite = input[spriteNumber];
                             break;
                         case "drain":
-                            newTileObject.GetComponent<SpriteRenderer>().sprite = drain;
+                            spriteNumber = (int) Mathf.Clamp(Mathf.FloorToInt((tile.waterLevel / tile.capacity) * drain.Length), 0, drain.Length - 1);
+                            newTileObject.GetComponent<SpriteRenderer>().sprite = drain[spriteNumber];
                             break;
                     }
 
@@ -253,8 +257,14 @@ public class PuzzleGenerator : MonoBehaviour
                 filling.hasBeenFlipped = true;
             }
         }
+        else if (filling.type == "input") {
+            sheet = input;
+        }
+        else if (filling.type == "drain") {
+            sheet = drain;
+        }
         if(sheet != null) {
-            int spriteNumber = (int) Mathf.Clamp(Mathf.FloorToInt((filling.waterLevel / filling.capacity) * sheet.Length), 0, 7);
+            int spriteNumber = (int) Mathf.Clamp(Mathf.FloorToInt((filling.waterLevel / filling.capacity) * sheet.Length), 0, (sheet.Length - 1));
             renderer.sprite = sheet[spriteNumber];
         }
     }

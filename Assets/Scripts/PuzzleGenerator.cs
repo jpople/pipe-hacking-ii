@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PuzzleGenerator : MonoBehaviour
 {
@@ -10,8 +11,8 @@ public class PuzzleGenerator : MonoBehaviour
     public GameObject cursorPrefab;
 
     // sprites
-    public Sprite straight;
-    public Sprite curve;
+    public Sprite[] straight;
+    public Sprite[] curve;
     public Sprite blank;
     public Sprite input;
     public Sprite drain;
@@ -145,10 +146,10 @@ public class PuzzleGenerator : MonoBehaviour
                     newTileObject.AddComponent<SpriteRenderer>();
                     switch(tile.type) {
                         case "straight":
-                            newTileObject.GetComponent<SpriteRenderer>().sprite = straight;
+                            newTileObject.GetComponent<SpriteRenderer>().sprite = straight[0];
                             break;
                         case "curve":
-                            newTileObject.GetComponent<SpriteRenderer>().sprite = curve;
+                            newTileObject.GetComponent<SpriteRenderer>().sprite = curve[0];
                             break;
                         case "blank":
                             newTileObject.GetComponent<SpriteRenderer>().sprite = blank;
@@ -188,12 +189,66 @@ public class PuzzleGenerator : MonoBehaviour
     }
 
     public void RefreshLabels () {
-        // oh god this sucks
-        for(int x = 0; x < boardWidth; x++) {
-            for (int y = 0; y < boardHeight; y++) {
-                TextMesh label = BoardManager.board[x, y].baseObject.GetComponentInChildren<TextMesh>();
-                label.text = BoardManager.board[x, y].waterLevel.ToString();
+        Tile filling = BoardManager.fillingTile;
+        SpriteRenderer renderer = BoardManager.fillingTile.baseObject.GetComponent<SpriteRenderer>();
+        Tile prev = null;
+        Vector2Int flowDirection = new Vector2Int(0, 0); // direction from which liquid is flowing into fillingTile
+
+        GameObject debugText = GameObject.Find("DebugText");
+
+        if(PipeLogic.pipeline.Count >= 2) {
+            int prevIndex = 0;
+            if (PipeLogic.pipeline.IndexOf(filling) > 0) {
+                prevIndex = PipeLogic.pipeline.IndexOf(filling) - 1;
             }
+            prev = PipeLogic.pipeline[prevIndex];
+            flowDirection = prev.position - filling.position; // direction from which liquid is flowing into fillingTile
+
+            debugText.GetComponent<Text>().text = $@"
+            pipeline length: {PipeLogic.pipeline.Count}
+            filling tile: {filling.position.ToString()} at index {PipeLogic.pipeline.IndexOf(filling)}
+            previous tile: {prev.position.ToString()} at index {PipeLogic.pipeline.IndexOf(prev)}
+            flow direction: {flowDirection.ToString()}
+            all pipeline tiles: 
+            ";
+            foreach (Tile tile in PipeLogic.pipeline) {
+                debugText.GetComponent<Text>().text += $"{tile.position.ToString()},";
+            }
+        }
+
+        Sprite[] sheet = null;
+
+        if (filling.type == "straight") {
+            sheet = straight;
+            // this stuff is necessary to make sure water renders from correct direction
+            
+            bool flip = false;
+
+            switch(flowDirection) {
+                case Vector2Int v when v.Equals(Vector2Int.right):
+                    flip = filling.orientation == 0;
+                    break;
+                case Vector2Int v when v.Equals(Vector2Int.up):
+                    flip = filling.orientation == 1;
+                    break;
+                case Vector2Int v when v.Equals(Vector2Int.left):
+                    flip = filling.orientation == 2;
+                    break;
+                case Vector2Int v when v.Equals(Vector2Int.down):
+                    flip = filling.orientation == 3;
+                    break;
+            }
+            if(flip && !filling.hasBeenFlipped) {
+                filling.baseObject.transform.Rotate(0, 0, 180);
+                filling.hasBeenFlipped = true;
+            }
+        }
+        else if (filling.type == "curve") {
+            sheet = curve;
+        }
+        if(sheet != null) {
+            int spriteNumber = (int) Mathf.Clamp(Mathf.FloorToInt((filling.waterLevel / filling.capacity) * sheet.Length), 0, 7);
+            renderer.sprite = sheet[spriteNumber];
         }
     }
 

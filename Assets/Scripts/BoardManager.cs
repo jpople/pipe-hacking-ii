@@ -27,7 +27,8 @@ public class Tile {
 
     // flow logic stuff
     public float capacity = 100f;
-    public float waterLevel = 0;
+    public float waterLevel = 0f;
+    public bool hasBeenFlipped = false;
 
     public GameObject baseObject;
 

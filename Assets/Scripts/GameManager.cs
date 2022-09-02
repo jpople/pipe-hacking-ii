@@ -1,10 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
     public PuzzleGenerator puzzleGenerator;
+    public Canvas resultsCanvas;
+    GameObject resultsText;
 
     void Start() {
         puzzleGenerator = GetComponent<PuzzleGenerator>();
@@ -13,12 +16,15 @@ public class GameManager : MonoBehaviour
         puzzleGenerator.GeneratePuzzle();
         puzzleGenerator.DrawBoard();
         puzzleGenerator.SpawnCursor();
+
+        resultsCanvas.enabled = false;
+        resultsText = GameObject.Find("ResultText");
     }
 
     void FixedUpdate() {
         if (BoardManager.fillingTile.waterLevel < BoardManager.fillingTile.capacity) {
             BoardManager.fillingTile.waterLevel += puzzleGenerator.flowRate;
-            puzzleGenerator.RefreshLabels();
+            puzzleGenerator.SpriteUpdate();
         }
         else {
             int index = PipeLogic.pipeline.IndexOf(BoardManager.fillingTile);
@@ -26,10 +32,12 @@ public class GameManager : MonoBehaviour
                 BoardManager.fillingTile = PipeLogic.pipeline[index + 1];
             }
             else if (BoardManager.fillingTile == BoardManager.drain) {
-                Debug.Log("you win!");
+                resultsCanvas.enabled = true;
+                resultsText.GetComponent<Text>().text = "Victory is yours!";
             }
             else {
-                Debug.Log("you lose!");
+                resultsCanvas.enabled = true;
+                resultsText.GetComponent<Text>().text = "You have been defeated!";
             }
         }
     }

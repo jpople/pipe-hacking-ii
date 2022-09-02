@@ -141,15 +141,19 @@ public class PuzzleGenerator : MonoBehaviour
             for (int x = 0; x < boardWidth; x++) {
                 Tile tile = BoardManager.board[x, y];
                 if (tile != null) {
+                    tile.hasBeenFlipped = false; // this is an ugly hack that results in weird off-frames; figure out if there's a way to properly preserve already-flipped tiles in between redraws
                     GameObject newTileObject = new GameObject();
 
                     newTileObject.AddComponent<SpriteRenderer>();
+                    int spriteNumber = 0;
                     switch(tile.type) {
                         case "straight":
-                            newTileObject.GetComponent<SpriteRenderer>().sprite = straight[0];
+                            spriteNumber = (int) Mathf.Clamp(Mathf.FloorToInt((tile.waterLevel / tile.capacity) * straight.Length), 0, straight.Length - 1);
+                            newTileObject.GetComponent<SpriteRenderer>().sprite = straight[spriteNumber];
                             break;
                         case "curve":
-                            newTileObject.GetComponent<SpriteRenderer>().sprite = curve[0];
+                            spriteNumber = (int) Mathf.Clamp(Mathf.FloorToInt((tile.waterLevel / tile.capacity) * curve.Length), 0, curve.Length - 1);
+                            newTileObject.GetComponent<SpriteRenderer>().sprite = curve[spriteNumber];
                             break;
                         case "blank":
                             newTileObject.GetComponent<SpriteRenderer>().sprite = blank;
@@ -173,28 +177,16 @@ public class PuzzleGenerator : MonoBehaviour
                     }
 
                     tile.baseObject = newTileObject;
-
-                    // elaborate debug stuff
-                    GameObject tileLabel = new GameObject();
-                    tileLabel.transform.position = tile.baseObject.transform.position;
-                    tileLabel.AddComponent<TextMesh>();
-                    TextMesh labelText = tileLabel.GetComponent<TextMesh>();
-                    labelText.text = tile.waterLevel.ToString();
-                    labelText.anchor = TextAnchor.MiddleCenter;
-                    labelText.characterSize = 0.05f;
-                    tileLabel.transform.parent = tile.baseObject.transform;
                 }
             }
         }
     }
 
-    public void RefreshLabels () {
+    public void SpriteUpdate () {
         Tile filling = BoardManager.fillingTile;
         SpriteRenderer renderer = BoardManager.fillingTile.baseObject.GetComponent<SpriteRenderer>();
         Tile prev = null;
         Vector2Int flowDirection = new Vector2Int(0, 0); // direction from which liquid is flowing into fillingTile
-
-        GameObject debugText = GameObject.Find("DebugText");
 
         if(PipeLogic.pipeline.Count >= 2) {
             int prevIndex = 0;
@@ -202,25 +194,14 @@ public class PuzzleGenerator : MonoBehaviour
                 prevIndex = PipeLogic.pipeline.IndexOf(filling) - 1;
             }
             prev = PipeLogic.pipeline[prevIndex];
-            flowDirection = prev.position - filling.position; // direction from which liquid is flowing into fillingTile
-
-            debugText.GetComponent<Text>().text = $@"
-            pipeline length: {PipeLogic.pipeline.Count}
-            filling tile: {filling.position.ToString()} at index {PipeLogic.pipeline.IndexOf(filling)}
-            previous tile: {prev.position.ToString()} at index {PipeLogic.pipeline.IndexOf(prev)}
-            flow direction: {flowDirection.ToString()}
-            all pipeline tiles: 
-            ";
-            foreach (Tile tile in PipeLogic.pipeline) {
-                debugText.GetComponent<Text>().text += $"{tile.position.ToString()},";
-            }
+            flowDirection = prev.position - filling.position;
         }
 
         Sprite[] sheet = null;
 
+        // gotta do a bunch of work here to make sure flow comes in from correct side of sprite
         if (filling.type == "straight") {
             sheet = straight;
-            // this stuff is necessary to make sure water renders from correct direction
             
             bool flip = false;
 
@@ -245,6 +226,32 @@ public class PuzzleGenerator : MonoBehaviour
         }
         else if (filling.type == "curve") {
             sheet = curve;
+
+            bool flip = false;
+
+            switch(flowDirection) {
+                case Vector2Int v when v.Equals(Vector2Int.down):
+                    flip = filling.orientation == 0;
+                    break;
+                case Vector2Int v when v.Equals(Vector2Int.right):
+                    flip = filling.orientation == 1;
+                    break;
+                case Vector2Int v when v.Equals(Vector2Int.up):
+                    flip = filling.orientation == 2;
+                    break;
+                case Vector2Int v when v.Equals(Vector2Int.left):
+                    flip = filling.orientation == 3;
+                    break;
+            }
+            if(flip && !filling.hasBeenFlipped) {
+                if (filling.orientation == 0 || filling.orientation == 2) {
+                    filling.baseObject.transform.Rotate(180, 0, -90);
+                }
+                else {
+                    filling.baseObject.transform.Rotate(0, 180, 90);
+                }
+                filling.hasBeenFlipped = true;
+            }
         }
         if(sheet != null) {
             int spriteNumber = (int) Mathf.Clamp(Mathf.FloorToInt((filling.waterLevel / filling.capacity) * sheet.Length), 0, 7);

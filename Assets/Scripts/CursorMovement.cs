@@ -57,8 +57,9 @@ public class CursorMovement : MonoBehaviour
         if(Input.GetKeyDown("e") && !isMoving) {
             if(!BoardManager.GetTile(position).isRevealed && !isRevealing) {
                 BoardManager.GetTile(position).isRevealed = true;
-                PipeLogic.TracePipeline(BoardManager.input.position);
                 StartCoroutine(DestroyCover());
+                PipeLogic.TracePipeline(BoardManager.input.position);
+                puzzle.DrawBoard();
             }
             else {
                 if (BoardManager.GetTile(position).waterLevel == 0) {

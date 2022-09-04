@@ -14,6 +14,7 @@ public class CursorMovement : MonoBehaviour
     public AudioSource selectAudio;
     public AudioSource swapAudio;
     public AudioSource revealAudio;
+    public AudioSource finishAudio;
 
     public float moveTime = 0.15f;
     bool isMoving;
@@ -55,6 +56,7 @@ public class CursorMovement : MonoBehaviour
         if(Input.GetKeyDown("e") && !isMoving) {
             if(!BoardManager.GetTile(position).isRevealed && !isRevealing) {
                 BoardManager.GetTile(position).isRevealed = true;
+                PipeLogic.TracePipeline(BoardManager.input.position);
                 StartCoroutine(DestroyCover());
             }
             else {
@@ -78,6 +80,7 @@ public class CursorMovement : MonoBehaviour
             isSelecting = true;
         }
         if(Input.GetKeyDown("f") && !isMoving) {
+            finishAudio.Play();
             puzzle.flowRate = 20;
         }
     }

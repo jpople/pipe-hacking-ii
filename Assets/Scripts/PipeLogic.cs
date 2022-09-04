@@ -77,7 +77,7 @@ public class PipeLogic
                             break;
                     }
 
-                    if(!newPipeline.Contains(next) && current.openings[i] && next.openings[(i + 2) % 4]) {
+                    if(!newPipeline.Contains(next) && current.openings[i] && next.openings[(i + 2) % 4] && next.isRevealed) {
                         newPipeline.Add(next);
                         next.isPartOfPipeline = true;
                         current = next;

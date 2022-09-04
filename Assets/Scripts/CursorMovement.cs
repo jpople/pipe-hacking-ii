@@ -15,6 +15,7 @@ public class CursorMovement : MonoBehaviour
     public AudioSource swapAudio;
     public AudioSource revealAudio;
     public AudioSource finishAudio;
+    public AudioSource forbiddenAudio;
 
     public float moveTime = 0.15f;
     bool isMoving;
@@ -70,6 +71,9 @@ public class CursorMovement : MonoBehaviour
                     else {
                         SwapTiles();
                     }
+                }
+                else {
+                    forbiddenAudio.Play();
                 }
             }
         }

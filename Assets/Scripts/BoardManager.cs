@@ -20,6 +20,7 @@ public class Tile {
     public int orientation; // # of 90° rotations CCW from upright position
     public string type;
     public bool[] openings; // starts at top and counts clockwise
+    public bool isRevealed = false;
 
     // pipe logic stuff
     public bool isBorder = false;

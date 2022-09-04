@@ -7,7 +7,11 @@ public class GameManager : MonoBehaviour
 {
     public PuzzleGenerator puzzleGenerator;
     public Canvas resultsCanvas;
-    GameObject resultsText;
+    public Image resultScreen;
+    public Text resultText;
+    public Text interactText;
+    public GameObject inputScreen;
+    public GameObject cancelPrompt;
 
     void Start() {
         puzzleGenerator = GetComponent<PuzzleGenerator>();
@@ -17,8 +21,7 @@ public class GameManager : MonoBehaviour
         puzzleGenerator.DrawBoard();
         puzzleGenerator.SpawnCursor();
 
-        resultsCanvas.enabled = false;
-        resultsText = GameObject.Find("ResultText");
+        resultScreen.enabled = false;
     }
 
     void FixedUpdate() {
@@ -32,12 +35,14 @@ public class GameManager : MonoBehaviour
                 BoardManager.fillingTile = PipeLogic.pipeline[index + 1];
             }
             else if (BoardManager.fillingTile == BoardManager.drain) {
-                resultsCanvas.enabled = true;
-                resultsText.GetComponent<Text>().text = "Victory is yours!";
+                resultScreen.enabled = true;
+                inputScreen.SetActive(false);
+                resultText.text = "Victory is yours!";
             }
             else {
-                resultsCanvas.enabled = true;
-                resultsText.GetComponent<Text>().text = "You have been defeated!";
+                resultScreen.enabled = true;
+                inputScreen.SetActive(false);
+                resultText.text = "You have been defeated!";
             }
         }
     }

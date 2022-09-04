@@ -21,6 +21,7 @@ public class CursorMovement : MonoBehaviour
     bool isSelecting = true;
 
     private void Start() {
+        manager = GameObject.Find("GameManager").GetComponent<GameManager>();
         puzzle = GameObject.Find("GameManager").GetComponent<PuzzleGenerator>();
     }
 
@@ -30,6 +31,9 @@ public class CursorMovement : MonoBehaviour
 
         Vector3 destinationPosition;
         Vector2Int destination;
+
+        manager.interactText.text = isSelecting ? "select" : "swap";
+        manager.cancelPrompt.SetActive(!isSelecting); 
 
         if (Input.GetKeyDown("w") && !isMoving) {
             destination = MovementTarget(position, Vector2Int.up);

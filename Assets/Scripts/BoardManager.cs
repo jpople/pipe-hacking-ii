@@ -73,6 +73,7 @@ public class BlankTile : Tile {
 public class InputTile : Tile {
     public InputTile(Vector2Int position) {
         this.type = "input";
+        this.isRevealed = true;
         this.isBorder = true;
         this.isPartOfPipeline = true;
         this.openings = new bool[] {false, true, false, false};
@@ -83,6 +84,7 @@ public class InputTile : Tile {
 public class DrainTile : Tile {
     public DrainTile(Vector2Int position) {
         this.type = "drain";
+        this.isRevealed = true;
         this.isBorder = true;
         this.openings = new bool[] {false, true, false, false};
         this.position = position;

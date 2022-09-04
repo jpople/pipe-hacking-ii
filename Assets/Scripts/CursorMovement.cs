@@ -17,6 +17,8 @@ public class CursorMovement : MonoBehaviour
     public float moveTime = 0.15f;
     bool isMoving;
 
+    public float coverFadeTime = 0.2f;
+
     public GameObject selectionPrefab;
     bool isSelecting = true;
 
@@ -28,47 +30,42 @@ public class CursorMovement : MonoBehaviour
     private void Update() {
         // also also TODO: update isSelected of tiles appropriately
         // TODO: this shit can *super* be refactored into a nicer external Move() method that can also handle the tiles' isSelected
-
-        Vector3 destinationPosition;
-        Vector2Int destination;
-
-        manager.interactText.text = isSelecting ? "select" : "swap";
+        if (!BoardManager.GetTile(position).isRevealed) {
+            manager.interactText.text = "reveal";
+        }
+        else {
+            manager.interactText.text = isSelecting ? "select" : "swap";
+        }
         manager.cancelPrompt.SetActive(!isSelecting); 
 
         if (Input.GetKeyDown("w") && !isMoving) {
-            destination = MovementTarget(position, Vector2Int.up);
-            destinationPosition = GetTransformPosition(destination);
-            StartCoroutine(MoveCursor(destinationPosition));
-            position = destination;
+            Move(Vector2Int.up);
         }
         if (Input.GetKeyDown("a") && !isMoving) {
-            destination = MovementTarget(position, Vector2Int.left);
-            destinationPosition = GetTransformPosition(destination);
-            StartCoroutine(MoveCursor(destinationPosition));
-            position = destination;
+            Move(Vector2Int.left);
         }
         if (Input.GetKeyDown("s") && !isMoving) {
-            destination = MovementTarget(position, Vector2Int.down);
-            destinationPosition = GetTransformPosition(destination);
-            StartCoroutine(MoveCursor(destinationPosition));
-            position = destination;
+            Move(Vector2Int.down);
         }
         if (Input.GetKeyDown("d") && !isMoving) {
-            destination = MovementTarget(position, Vector2Int.right);
-            destinationPosition = GetTransformPosition(destination);
-            StartCoroutine(MoveCursor(destinationPosition));
-            position = destination;
+            Move(Vector2Int.right);
         }
         if(Input.GetKeyDown("e") && !isMoving) {
-            if (BoardManager.GetTile(position).waterLevel == 0) {
-                if (isSelecting) {
-                    selectAudio.Play();
-                    GameObject selectionIndicator = GameObject.Instantiate(selectionPrefab, transform.position, Quaternion.identity);
-                    BoardManager.selectedTile = BoardManager.GetTile(position);
-                    isSelecting = false;
-                }
-                else {
-                    SwapTiles();
+            if(!BoardManager.GetTile(position).isRevealed) {
+                StartCoroutine(DestroyCover());
+                BoardManager.GetTile(position).isRevealed = true;
+            }
+            else {
+                if (BoardManager.GetTile(position).waterLevel == 0) {
+                    if (isSelecting) {
+                        selectAudio.Play();
+                        GameObject selectionIndicator = GameObject.Instantiate(selectionPrefab, transform.position, Quaternion.identity);
+                        BoardManager.selectedTile = BoardManager.GetTile(position);
+                        isSelecting = false;
+                    }
+                    else {
+                        SwapTiles();
+                    }
                 }
             }
         }
@@ -124,6 +121,16 @@ public class CursorMovement : MonoBehaviour
         isSelecting = true;
     }
 
+    void Move(Vector2Int direction) {
+        Vector2Int destination = MovementTarget(position, direction);
+        Vector3 destinationPosition = GetTransformPosition(destination);
+        StartCoroutine(MoveCursor(destinationPosition));
+        position = destination;
+        if(!BoardManager.GetTile(position).isRevealed) {
+            manager.interactText.text = "reveal";
+        }
+    }
+
     private IEnumerator MoveCursor(Vector3 destination) {
         isMoving = true;
 
@@ -140,5 +147,24 @@ public class CursorMovement : MonoBehaviour
         transform.position = destination;
         moveAudio.Play();
         isMoving = false;
+    }
+
+    private IEnumerator DestroyCover() {
+        
+        float elapsedTime = 0f;
+
+        Transform cover = BoardManager.GetTile(position).baseObject.transform.GetChild(0);
+        Vector3 startPosition = cover.position;
+        Vector3 destination = startPosition + new Vector3(0, 0.05f, 0);
+
+        while(elapsedTime < coverFadeTime) {
+            cover.position = Vector3.Lerp(startPosition, destination, (elapsedTime / moveTime));
+            cover.gameObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, Mathf.Lerp(1, 0, (elapsedTime / moveTime)));
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        Destroy(cover.gameObject);
+
     }
 }

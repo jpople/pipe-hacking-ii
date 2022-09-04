@@ -16,6 +16,7 @@ public class PuzzleGenerator : MonoBehaviour
     public Sprite blank;
     public Sprite[] input;
     public Sprite[] drain;
+    public Sprite cover;
 
     // random tile spawn rates (proportional, e.g. 2/2/1 yields 40%/40%/20% spawn chance)
     public int straightChance;
@@ -145,6 +146,7 @@ public class PuzzleGenerator : MonoBehaviour
                     GameObject newTileObject = new GameObject();
 
                     newTileObject.AddComponent<SpriteRenderer>();
+                    newTileObject.GetComponent<SpriteRenderer>().sortingLayerName = "Pipes";
                     int spriteNumber = 0;
                     switch(tile.type) {
                         case "straight":
@@ -178,6 +180,15 @@ public class PuzzleGenerator : MonoBehaviour
                     if (!tile.isBorder && !tile.isPartOfPipeline) {
                         newTileObject.transform.localScale = newTileObject.transform.localScale * 0.75f;
                         newTileObject.GetComponent<SpriteRenderer>().color = new Color(0.8f, 0.8f, 0.8f);
+                    }
+                    
+                    if(!tile.isBorder && !tile.isRevealed) {
+                        GameObject tileCover = new GameObject();
+                        tileCover.AddComponent<SpriteRenderer>();
+                        tileCover.GetComponent<SpriteRenderer>().sprite = cover;
+                        tileCover.GetComponent<SpriteRenderer>().sortingLayerName = "Covers";
+                        tileCover.transform.position = new Vector3(x * tileScaling, y * tileScaling, 1);
+                        tileCover.transform.parent = newTileObject.transform;
                     }
 
                     tile.baseObject = newTileObject;

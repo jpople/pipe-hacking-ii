@@ -38,6 +38,18 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Background
+    uniqueID: 962005099
+    locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Pipes
+    uniqueID: 1731326747
+    locked: 0
+  - name: Covers
+    uniqueID: 1245833429
+    locked: 0
+  - name: Cursors
+    uniqueID: 430198601
     locked: 0

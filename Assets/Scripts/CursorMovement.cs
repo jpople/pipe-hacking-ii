@@ -13,11 +13,13 @@ public class CursorMovement : MonoBehaviour
     public AudioSource cancelAudio;
     public AudioSource selectAudio;
     public AudioSource swapAudio;
+    public AudioSource revealAudio;
 
     public float moveTime = 0.15f;
     bool isMoving;
 
     public float coverFadeTime = 0.2f;
+    bool isRevealing;
 
     public GameObject selectionPrefab;
     bool isSelecting = true;
@@ -51,9 +53,9 @@ public class CursorMovement : MonoBehaviour
             Move(Vector2Int.right);
         }
         if(Input.GetKeyDown("e") && !isMoving) {
-            if(!BoardManager.GetTile(position).isRevealed) {
-                StartCoroutine(DestroyCover());
+            if(!BoardManager.GetTile(position).isRevealed && !isRevealing) {
                 BoardManager.GetTile(position).isRevealed = true;
+                StartCoroutine(DestroyCover());
             }
             else {
                 if (BoardManager.GetTile(position).waterLevel == 0) {
@@ -150,10 +152,12 @@ public class CursorMovement : MonoBehaviour
     }
 
     private IEnumerator DestroyCover() {
-        
+        isRevealing = true;
+        revealAudio.Play();
         float elapsedTime = 0f;
 
         Transform cover = BoardManager.GetTile(position).baseObject.transform.GetChild(0);
+        cover.parent = null;
         Vector3 startPosition = cover.position;
         Vector3 destination = startPosition + new Vector3(0, 0.05f, 0);
 
@@ -164,7 +168,8 @@ public class CursorMovement : MonoBehaviour
             yield return null;
         }
 
-        Destroy(cover.gameObject);
+        // Destroy(cover.gameObject);
+        isRevealing = false;
 
     }
 }

@@ -12,6 +12,10 @@ public class GameManager : MonoBehaviour
     public Text interactText;
     public GameObject inputScreen;
     public GameObject cancelPrompt;
+    public AudioSource victoryAudio;
+    public AudioSource defeatAudio;
+
+    bool gameOver = false;
 
     void Start() {
         puzzleGenerator = GetComponent<PuzzleGenerator>();
@@ -35,14 +39,22 @@ public class GameManager : MonoBehaviour
                 BoardManager.fillingTile = PipeLogic.pipeline[index + 1];
             }
             else if (BoardManager.fillingTile == BoardManager.drain) {
+                if(!gameOver) {
+                    victoryAudio.Play();
+                }
                 resultScreen.enabled = true;
                 inputScreen.SetActive(false);
                 resultText.text = "Victory is yours!";
+                gameOver = true;
             }
             else {
+                if(!gameOver) {
+                    defeatAudio.Play();
+                }
                 resultScreen.enabled = true;
                 inputScreen.SetActive(false);
                 resultText.text = "You have been defeated!";
+                gameOver = true;
             }
         }
     }

@@ -133,68 +133,75 @@ public class PuzzleGenerator : MonoBehaviour
     }
 
     public void DrawBoard() {
-        GameObject tileHolder = GameObject.Find("TileHolder");
-        foreach (Transform child in tileHolder.transform) {
-            GameObject.Destroy(child.gameObject);
-        }
-
+        Debug.Log("we're in DBA!");
+        Transform tileHolder = GameObject.Find("TileHolder").transform;
         for (int y = 0; y < boardHeight; y++) {
             for (int x = 0; x < boardWidth; x++) {
-                Tile tile = BoardManager.board[x, y];
-                if (tile != null) {
-                    tile.hasBeenFlipped = false; // this is an ugly hack that results in weird off-frames; figure out if there's a way to properly preserve already-flipped tiles in between redraws
-                    GameObject newTileObject = new GameObject();
-
-                    newTileObject.AddComponent<SpriteRenderer>();
-                    newTileObject.GetComponent<SpriteRenderer>().sortingLayerName = "Pipes";
-                    int spriteNumber = 0;
-                    switch(tile.type) {
-                        case "straight":
-                            spriteNumber = (int) Mathf.Clamp(Mathf.FloorToInt((tile.waterLevel / tile.capacity) * straight.Length), 0, straight.Length - 1);
-                            newTileObject.GetComponent<SpriteRenderer>().sprite = straight[spriteNumber];
-                            break;
-                        case "curve":
-                            spriteNumber = (int) Mathf.Clamp(Mathf.FloorToInt((tile.waterLevel / tile.capacity) * curve.Length), 0, curve.Length - 1);
-                            newTileObject.GetComponent<SpriteRenderer>().sprite = curve[spriteNumber];
-                            break;
-                        case "blank":
-                            if(!tile.isBorder) {
-                                newTileObject.GetComponent<SpriteRenderer>().sprite = blank;
-                            }
-                            break;
-                        case "input":
-                            spriteNumber = (int) Mathf.Clamp(Mathf.FloorToInt((tile.waterLevel / tile.capacity) * input.Length), 0, input.Length - 1);
-                            newTileObject.GetComponent<SpriteRenderer>().sprite = input[spriteNumber];
-                            break;
-                        case "drain":
-                            spriteNumber = (int) Mathf.Clamp(Mathf.FloorToInt((tile.waterLevel / tile.capacity) * drain.Length), 0, drain.Length - 1);
-                            newTileObject.GetComponent<SpriteRenderer>().sprite = drain[spriteNumber];
-                            break;
-                    }
-
-                    newTileObject.transform.position = new Vector3(x * tileScaling, y * tileScaling, 0);
-                    newTileObject.transform.Rotate(new Vector3(0, 0, tile.orientation * 90));
-                    newTileObject.name = $"{tile.type} @ {tile.position.x}, {tile.position.y}";
-
-                    newTileObject.transform.parent = tileHolder.transform;
-                    if (!tile.isBorder && !tile.isPartOfPipeline) {
-                        newTileObject.transform.localScale = newTileObject.transform.localScale * 0.75f;
-                        newTileObject.GetComponent<SpriteRenderer>().color = new Color(0.8f, 0.8f, 0.8f);
-                    }
-                    
-                    if(!tile.isBorder && !tile.isRevealed) {
-                        GameObject tileCover = new GameObject();
-                        tileCover.AddComponent<SpriteRenderer>();
-                        tileCover.GetComponent<SpriteRenderer>().sprite = cover;
-                        tileCover.GetComponent<SpriteRenderer>().sortingLayerName = "Covers";
-                        tileCover.transform.position = new Vector3(x * tileScaling, y * tileScaling, 1);
-                        tileCover.transform.parent = newTileObject.transform;
-                    }
-
-                    tile.baseObject = newTileObject;
+                if (BoardManager.GetTile(new Vector2Int(x, y)).waterLevel == 0) {
+                    GameObject.Destroy(BoardManager.GetTile(new Vector2Int(x, y)).baseObject);
+                    BoardManager.GetTile(new Vector2Int(x, y)).baseObject = null;
                 }
             }
         }
+
+        for(int y = 0; y < boardHeight; y++) {
+            for (int x = 0; x < boardWidth; x++) {
+                Tile tile = BoardManager.GetTile(new Vector2Int(x, y));
+                if (tile != null && tile.baseObject == null) {
+                    tile.baseObject = GenerateTileObject(tile, tileHolder);
+                }
+            }
+        }
+    }
+
+    GameObject GenerateTileObject(Tile tile, Transform tileHolder) {
+        GameObject newTileObject = new GameObject();
+
+        newTileObject.AddComponent<SpriteRenderer>();
+        SpriteRenderer renderer = newTileObject.GetComponent<SpriteRenderer>();
+        renderer.sortingLayerName = "Pipes";
+        
+        switch(tile.type) {
+            case "straight":
+                renderer.sprite = tile.getSprite(straight);
+                break;
+            case "curve":
+                renderer.sprite = tile.getSprite(curve);
+                break;
+            case "blank":
+                if(!tile.isBorder) {
+                    renderer.sprite = blank;
+                }
+                break;
+            case "input":
+                renderer.sprite = tile.getSprite(input);
+                break;
+            case "drain":
+                renderer.sprite = tile.getSprite(drain);
+                break;
+        }
+
+        newTileObject.transform.position = new Vector3(tile.position.x * tileScaling, tile.position.y * tileScaling, 0);
+        newTileObject.transform.Rotate(new Vector3(0, 0, tile.orientation * 90));
+        newTileObject.name = $"{tile.type} @ {tile.position.ToString()}";
+
+        newTileObject.transform.parent = tileHolder;
+        if (!tile.isBorder && !tile.isPartOfPipeline) {
+            newTileObject.transform.localScale = newTileObject.transform.localScale * 0.75f;
+            renderer.color = new Color(0.8f, 0.8f, 0.8f);
+        }
+
+        if(!tile.isBorder && !tile.isRevealed) {
+            GameObject tileCover = new GameObject();
+            tileCover.AddComponent<SpriteRenderer>();
+            SpriteRenderer tileCoverSprite = tileCover.GetComponent<SpriteRenderer>();
+            tileCoverSprite.sprite = cover;
+            tileCoverSprite.sortingLayerName = "Covers";
+            tileCover.transform.position = new Vector3(tile.position.x * tileScaling, tile.position.y * tileScaling, 1);
+            tileCover.transform.parent = newTileObject.transform;
+        }
+
+        return newTileObject;
     }
 
     public void SpriteUpdate () {

@@ -40,6 +40,12 @@ public class Tile {
         }
         this.openings = rotated;
     }
+
+    public Sprite getSprite(Sprite[] sheet) {
+        float waterPercent = waterLevel / capacity;
+        int spriteNumber = (int) Mathf.Clamp(Mathf.FloorToInt(waterPercent * sheet.Length), 0, sheet.Length - 1);
+        return sheet[spriteNumber];
+    }
 }
 
 public class StraightTile : Tile {

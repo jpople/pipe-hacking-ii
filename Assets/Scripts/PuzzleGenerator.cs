@@ -34,6 +34,7 @@ public class PuzzleGenerator : MonoBehaviour
 
     public void GeneratePuzzle() {
         GenerateGoals();
+        GenerateRequiredTiles();
         for (int x = 0; x < boardWidth; x++) {
             for (int y = 0; y < boardHeight; y++) {
                 if (BoardManager.board[x, y] == null) {
@@ -132,8 +133,36 @@ public class PuzzleGenerator : MonoBehaviour
 
     }
 
+    public void GenerateRequiredTiles() {
+        List<Tile> required = new List<Tile>();
+        Vector2Int netMovement = BoardManager.drain.position - BoardManager.input.position;
+        netMovement = new Vector2Int(Mathf.Abs(netMovement.x), Mathf.Abs(netMovement.y));
+
+        for (int i = 0; i < netMovement.x; i++) {
+            Vector2Int position = RandomUnoccupiedPosition();
+            BoardManager.board[position.x, position.y] = new StraightTile(position, 0);
+        }
+        for (int i = 0; i < netMovement.y; i++) {
+            Vector2Int position = RandomUnoccupiedPosition();
+            BoardManager.board[position.x, position.y] = new StraightTile(position, 1);
+        }
+        for (int i = 0; i < 4; i++) {
+            Vector2Int position = RandomUnoccupiedPosition();
+            BoardManager.board[position.x, position.y] = new CurveTile(position, i);
+        }
+    }
+
+    public Vector2Int RandomUnoccupiedPosition() {
+        Vector2Int attempt = new Vector2Int(0, 0);
+        bool valid = false;
+        while(!valid) {
+            attempt = new Vector2Int(Random.Range(1, 6), Random.Range(1, 6));
+            valid = BoardManager.GetTile(attempt) == null;
+        }
+        return attempt;
+    }
+
     public void DrawBoard() {
-        Debug.Log("we're in DBA!");
         Transform tileHolder = GameObject.Find("TileHolder").transform;
         for (int y = 0; y < boardHeight; y++) {
             for (int x = 0; x < boardWidth; x++) {

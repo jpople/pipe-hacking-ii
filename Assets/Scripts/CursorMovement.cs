@@ -176,7 +176,7 @@ public class CursorMovement : MonoBehaviour
             yield return null;
         }
 
-        // Destroy(cover.gameObject);
+        Destroy(cover.gameObject);
         isRevealing = false;
 
     }

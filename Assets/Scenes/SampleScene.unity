@@ -820,8 +820,8 @@ MonoBehaviour:
   - {fileID: 8619338647252938562, guid: ad3cc78957cfea5498391e62f3fd5cb0, type: 3}
   - {fileID: 8570786476384916228, guid: ad3cc78957cfea5498391e62f3fd5cb0, type: 3}
   cover: {fileID: 21300000, guid: 209d99aaa16a02c4eab3078bd4d7f56d, type: 3}
-  straightChance: 2
-  curveChance: 2
+  straightChance: 1
+  curveChance: 1
   blankChance: 1
   flowRate: 0.3
   tileScaling: 0.17

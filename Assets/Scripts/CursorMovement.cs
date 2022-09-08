@@ -47,26 +47,30 @@ public class CursorMovement : MonoBehaviour
         // take in inputs and queue appropriate actions
         if(!isMoving) {
             if (Input.GetKeyDown("w")) {
-                new MoveAction(this, Vector2Int.up).Execute();
+                actionQueue.Enqueue(new MoveAction(this, Vector2Int.up));
             }
             if (Input.GetKeyDown("a")) {
-                new MoveAction(this, Vector2Int.left).Execute();
+                actionQueue.Enqueue(new MoveAction(this, Vector2Int.left));
             }
             if (Input.GetKeyDown("s")) {
-                new MoveAction(this, Vector2Int.down).Execute();
+                actionQueue.Enqueue(new MoveAction(this, Vector2Int.down));
             }
             if (Input.GetKeyDown("d")) {
-                new MoveAction(this, Vector2Int.right).Execute();
+                actionQueue.Enqueue(new MoveAction(this, Vector2Int.right));
             }
             if(Input.GetKeyDown("e")) {
-                new InteractAction(this).Execute();
+                actionQueue.Enqueue(new InteractAction(this));
             }
             if(Input.GetKeyDown("q")) {
-                new CancelAction(this).Execute();
+                actionQueue.Enqueue(new CancelAction(this));
             }
             if(Input.GetKeyDown("f")) {
-                new FinishAction(this).Execute();
+                actionQueue.Enqueue(new FinishAction(this));
             }
+        }
+
+        if(actionQueue.Count != 0) {
+            actionQueue.Dequeue().Execute();
         }
     }
 

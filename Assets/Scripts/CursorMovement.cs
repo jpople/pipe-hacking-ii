@@ -55,38 +55,13 @@ public class CursorMovement : MonoBehaviour
             Move(Vector2Int.right);
         }
         if(Input.GetKeyDown("e") && !isMoving) {
-            if(!BoardManager.GetTile(position).isRevealed && !isRevealing) {
-                BoardManager.GetTile(position).isRevealed = true;
-                StartCoroutine(DestroyCover());
-                PipeLogic.TracePipeline(BoardManager.input.position);
-                puzzle.DrawBoard();
-            }
-            else {
-                if (BoardManager.GetTile(position).waterLevel == 0) {
-                    if (isSelecting) {
-                        selectAudio.Play();
-                        GameObject selectionIndicator = GameObject.Instantiate(selectionPrefab, transform.position, Quaternion.identity);
-                        BoardManager.selectedTile = BoardManager.GetTile(position);
-                        isSelecting = false;
-                    }
-                    else {
-                        SwapTiles();
-                    }
-                }
-                else {
-                    forbiddenAudio.Play();
-                }
-            }
+            HandleInteract();
         }
         if(Input.GetKeyDown("q") && !isMoving) {
-            cancelAudio.Play();
-            Destroy(GameObject.Find("Selected(Clone)"));
-            BoardManager.selectedTile = null;
-            isSelecting = true;
+            CancelSelection();
         }
         if(Input.GetKeyDown("f") && !isMoving) {
-            finishAudio.Play();
-            puzzle.flowRate = 20;
+            Finish();
         }
     }
 
@@ -139,6 +114,43 @@ public class CursorMovement : MonoBehaviour
         if(!BoardManager.GetTile(position).isRevealed) {
             manager.interactText.text = "reveal";
         }
+    }
+
+    void HandleInteract() {
+        if(!BoardManager.GetTile(position).isRevealed && !isRevealing) {
+            BoardManager.GetTile(position).isRevealed = true;
+            StartCoroutine(DestroyCover());
+            PipeLogic.TracePipeline(BoardManager.input.position);
+            puzzle.DrawBoard();
+        }
+        else {
+            if (BoardManager.GetTile(position).waterLevel == 0) {
+                if (isSelecting) {
+                    selectAudio.Play();
+                    GameObject selectionIndicator = GameObject.Instantiate(selectionPrefab, transform.position, Quaternion.identity);
+                    BoardManager.selectedTile = BoardManager.GetTile(position);
+                    isSelecting = false;
+                }
+                else {
+                    SwapTiles();
+                }
+            }
+            else {
+                forbiddenAudio.Play();
+            }
+        }
+    }
+
+    void CancelSelection() {
+        cancelAudio.Play();
+        Destroy(GameObject.Find("Selected(Clone)"));
+        BoardManager.selectedTile = null;
+        isSelecting = true;
+    }
+
+    void Finish() {
+        finishAudio.Play();
+        puzzle.flowRate = 20;
     }
 
     private IEnumerator MoveCursor(Vector3 destination) {

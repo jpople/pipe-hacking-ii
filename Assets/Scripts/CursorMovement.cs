@@ -35,7 +35,7 @@ public class CursorMovement : MonoBehaviour
     }
 
     private void Update() {
-        // handle updating input prompts (does this need to be here?)
+        // handle updating input prompts (does this need to be here? no, right?)
         if (!BoardManager.GetTile(position).isRevealed) {
             manager.interactText.text = "reveal";
         }
@@ -69,12 +69,18 @@ public class CursorMovement : MonoBehaviour
             }
         }
 
+        // resolve the first action in the queue
         if(actionQueue.Count != 0) {
             actionQueue.Dequeue().Execute();
         }
     }
 
-    // are MovementTarget and GetTransformPosition better placed somewhere else?  BoardManager maybe?
+    
+    /* ===========================
+        MOVEMENT HELPER METHODS
+    =========================== */
+
+    // are these better placed somewhere else?  BoardManager maybe?
     // neither of them cares about anything in our class
 
     public Vector2Int MovementTarget(Vector2Int start, Vector2Int direction) { // "clips" movement to make edges of board loop
@@ -98,8 +104,32 @@ public class CursorMovement : MonoBehaviour
         return BoardManager.board[coords.x, coords.y].baseObject.transform.position;
     }
 
+    /* ===========================
+        ACTION HANDLING METHODS
+    ============================ */
+
+    public void HandleInteract() {
+        if(!BoardManager.GetTile(position).isRevealed && !isRevealing) {
+            Reveal();
+        }
+        else {
+            if (BoardManager.GetTile(position).waterLevel == 0) {
+                if (isSelecting) {
+                    Select();
+                }
+                else {
+                    SwapTiles();
+                }
+            }
+            else {
+                forbiddenAudio.Play();
+            }
+        }
+    }
+
     void SwapTiles() {
         // should probably add a coroutine/animation for this but this'll be fine for now
+        // also, maybe some of the board logic here should live in BoardManager?
         Tile hovered = BoardManager.GetTile(position);
         Tile selected = BoardManager.selectedTile;
         Vector2Int selectedPositionCopy = selected.position;
@@ -108,7 +138,7 @@ public class CursorMovement : MonoBehaviour
         selected.position = hovered.position;
         hovered.position = selectedPositionCopy;
 
-        PipeLogic.TracePipeline(BoardManager.input.position);
+        PipeLogic.TracePipeline(BoardManager.input.position); // don't forget to update this not to take a parameter anymore at some point
         puzzle.DrawBoard();
 
 
@@ -128,29 +158,18 @@ public class CursorMovement : MonoBehaviour
         }
     }
 
-    public void HandleInteract() {
-        if(!BoardManager.GetTile(position).isRevealed && !isRevealing) {
-            BoardManager.GetTile(position).isRevealed = true;
-            StartCoroutine(DestroyCover());
-            PipeLogic.TracePipeline(BoardManager.input.position);
-            puzzle.DrawBoard();
-        }
-        else {
-            if (BoardManager.GetTile(position).waterLevel == 0) {
-                if (isSelecting) {
-                    selectAudio.Play();
-                    GameObject selectionIndicator = GameObject.Instantiate(selectionPrefab, transform.position, Quaternion.identity);
-                    BoardManager.selectedTile = BoardManager.GetTile(position);
-                    isSelecting = false;
-                }
-                else {
-                    SwapTiles();
-                }
-            }
-            else {
-                forbiddenAudio.Play();
-            }
-        }
+    void Select() {
+        selectAudio.Play();
+        GameObject selectionIndicator = GameObject.Instantiate(selectionPrefab, transform.position, Quaternion.identity);
+        BoardManager.selectedTile = BoardManager.GetTile(position);
+        isSelecting = false;
+    }
+
+    void Reveal() {
+        BoardManager.GetTile(position).isRevealed = true;
+        StartCoroutine(DestroyCover());
+        PipeLogic.TracePipeline(BoardManager.input.position);
+        puzzle.DrawBoard();
     }
 
     public void CancelSelection() {
@@ -164,6 +183,10 @@ public class CursorMovement : MonoBehaviour
         finishAudio.Play();
         puzzle.flowRate = 20;
     }
+
+    /* ==============
+        COROUTINES
+    ============== */
 
     private IEnumerator MoveCursor(Vector3 destination) {
         isMoving = true;

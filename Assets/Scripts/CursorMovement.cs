@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CursorMovement : MonoBehaviour
 {
@@ -21,6 +22,7 @@ public class CursorMovement : MonoBehaviour
 
     public float moveTime = 0.15f;
     bool isMoving;
+    bool isAcceptingInput = true;
 
     public float coverFadeTime = 0.2f;
     bool isRevealing;
@@ -45,32 +47,32 @@ public class CursorMovement : MonoBehaviour
         manager.cancelPrompt.SetActive(!isSelecting); 
 
         // take in inputs and queue appropriate actions
-        if(!isMoving) {
-            if (Input.GetKeyDown("w")) {
+        if(isAcceptingInput) {
+            if (Input.GetButtonDown("MoveUp")) {
                 actionQueue.Enqueue(new MoveAction(this, Vector2Int.up));
             }
-            if (Input.GetKeyDown("a")) {
-                actionQueue.Enqueue(new MoveAction(this, Vector2Int.left));
-            }
-            if (Input.GetKeyDown("s")) {
+            if (Input.GetButtonDown("MoveDown")) {
                 actionQueue.Enqueue(new MoveAction(this, Vector2Int.down));
             }
-            if (Input.GetKeyDown("d")) {
+            if (Input.GetButtonDown("MoveLeft")) {
+                actionQueue.Enqueue(new MoveAction(this, Vector2Int.left));
+            }
+            if (Input.GetButtonDown("MoveRight")) {
                 actionQueue.Enqueue(new MoveAction(this, Vector2Int.right));
             }
-            if(Input.GetKeyDown("e")) {
+            if(Input.GetButtonDown("Interact")) {
                 actionQueue.Enqueue(new InteractAction(this));
             }
-            if(Input.GetKeyDown("q")) {
+            if(Input.GetButtonDown("Cancel")) {
                 actionQueue.Enqueue(new CancelAction(this));
             }
-            if(Input.GetKeyDown("f")) {
+            if(Input.GetButtonDown("Finish")) {
                 actionQueue.Enqueue(new FinishAction(this));
             }
         }
 
         // resolve the first action in the queue
-        if(actionQueue.Count != 0) {
+        if(actionQueue.Count != 0 && !isMoving) {
             actionQueue.Dequeue().Execute();
         }
     }
@@ -81,7 +83,7 @@ public class CursorMovement : MonoBehaviour
     =========================== */
 
     // are these better placed somewhere else?  BoardManager maybe?
-    // neither of them cares about anything in our class
+    // neither of them cares about anything in this class
 
     public Vector2Int MovementTarget(Vector2Int start, Vector2Int direction) { // "clips" movement to make edges of board loop
         Vector2Int target = start + direction;
@@ -109,7 +111,7 @@ public class CursorMovement : MonoBehaviour
     ============================ */
 
     public void HandleInteract() {
-        if(!BoardManager.GetTile(position).isRevealed && !isRevealing) {
+        if(!BoardManager.GetTile(position).isRevealed) {
             Reveal();
         }
         else {
@@ -190,6 +192,7 @@ public class CursorMovement : MonoBehaviour
 
     private IEnumerator MoveCursor(Vector3 destination) {
         isMoving = true;
+        isAcceptingInput = false;
 
         float elapsedTime = 0f;
 
@@ -198,6 +201,9 @@ public class CursorMovement : MonoBehaviour
         while(elapsedTime < moveTime) {
             transform.position = Vector3.Lerp(startPosition, destination, (elapsedTime / moveTime));
             elapsedTime += Time.deltaTime;
+            if (elapsedTime / moveTime > 0.5) {
+                isAcceptingInput = true;
+            }
             yield return null;
         }
         

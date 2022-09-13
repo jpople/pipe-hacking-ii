@@ -7,22 +7,29 @@ public class MenuManager : MonoBehaviour
 {
     public GameObject menuScreen;
     public GameObject howToScreen;
+    public GameObject creditsScreen;
 
     public void Start() {
         menuScreen.SetActive(true);
-        // howToScreen.SetActive(false);
     }
+
     public void GoToTutorial() {
         menuScreen.SetActive(false);
         howToScreen.SetActive(true);
     }
 
+    public void GoToCredits() {
+        menuScreen.SetActive(false);
+        creditsScreen.SetActive(true);
+    }
+
     public void GoToMain() {
         menuScreen.SetActive(true);
         howToScreen.SetActive(false);
+        creditsScreen.SetActive(false);
     }
 
     public void Play() {
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene(1);
     }
 }

@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public PuzzleGenerator puzzleGenerator;
     public Canvas resultsCanvas;
-    public Image resultScreen;
+    public GameObject resultScreen;
     public Text resultText;
     public Text interactText;
     public GameObject inputScreen;
@@ -15,7 +16,7 @@ public class GameManager : MonoBehaviour
     public AudioSource victoryAudio;
     public AudioSource defeatAudio;
 
-    bool gameOver = false;
+    public bool gameOver = false;
 
     void Start() {
         puzzleGenerator = GetComponent<PuzzleGenerator>();
@@ -25,7 +26,8 @@ public class GameManager : MonoBehaviour
         puzzleGenerator.DrawBoard();
         puzzleGenerator.SpawnCursor();
 
-        resultScreen.enabled = false;
+        resultScreen = GameObject.Find("ResultScreen");
+        resultScreen.SetActive(false);
     }
 
     void FixedUpdate() {
@@ -42,7 +44,7 @@ public class GameManager : MonoBehaviour
                 if(!gameOver) {
                     victoryAudio.Play();
                 }
-                resultScreen.enabled = true;
+                resultScreen.SetActive(true);
                 inputScreen.SetActive(false);
                 resultText.text = "Victory is yours!";
                 gameOver = true;
@@ -51,11 +53,19 @@ public class GameManager : MonoBehaviour
                 if(!gameOver) {
                     defeatAudio.Play();
                 }
-                resultScreen.enabled = true;
+                resultScreen.SetActive(true);
                 inputScreen.SetActive(false);
                 resultText.text = "You have been defeated!";
                 gameOver = true;
             }
         }
+    }
+
+    public void ReturnToMenu() {
+        SceneManager.LoadScene(0);
+    }
+
+    public void Restart() {
+        SceneManager.LoadScene(1);
     }
 }

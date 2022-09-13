@@ -37,6 +37,10 @@ public class CursorMovement : MonoBehaviour
     }
 
     private void Update() {
+        if (manager.gameOver) {
+            isAcceptingInput = false;
+        }
+
         // handle updating input prompts (does this need to be here? no, right?)
         if (!BoardManager.GetTile(position).isRevealed) {
             manager.interactText.text = "reveal";
@@ -213,7 +217,6 @@ public class CursorMovement : MonoBehaviour
     }
 
     private IEnumerator DestroyCover() {
-        isRevealing = true;
         revealAudio.Play();
         float elapsedTime = 0f;
 
@@ -230,7 +233,5 @@ public class CursorMovement : MonoBehaviour
         }
 
         Destroy(cover.gameObject);
-        isRevealing = false;
-
     }
 }
